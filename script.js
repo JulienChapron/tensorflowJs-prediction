@@ -42,7 +42,7 @@ async function run() {
   // Convert the data to a form we can use for training.
   const tensorData = convertToTensor(data);
   const { inputs, labels } = tensorData;
-  
+
   // Train the model
   await trainModel(model, inputs, labels);
   console.log("Done Training");
@@ -57,10 +57,11 @@ document.addEventListener("DOMContentLoaded", run);
 function createModel() {
   // Create a sequential model
   const model = tf.sequential();
-
   // Add a single input layer
-  model.add(tf.layers.dense({ inputShape: [1], units: 1, useBias: true }));
-
+  model.add(tf.layers.dense({ inputShape: [1], units: 1000, useBias: true }));
+  model.add(tf.layers.dense({ units: 50, activation: "sigmoid" }));
+  model.add(tf.layers.dense({units: 32, activation: 'relu'}));
+  model.add(tf.layers.dense({units: 50, activation: 'softmax'}));
   // Add an output layer
   model.add(tf.layers.dense({ units: 1, useBias: true }));
 
@@ -121,7 +122,7 @@ async function trainModel(model, inputs, labels) {
   });
 
   const batchSize = 32;
-  const epochs = 50;
+  const epochs = 350;
 
   return await model.fit(inputs, labels, {
     batchSize,
@@ -161,7 +162,6 @@ function testModel(model, inputData, normalizationData) {
     x: d.horsepower,
     y: d.mpg,
   }));
-
   tfvis.render.scatterplot(
     { name: "Model Predictions vs Original Data" },
     {
